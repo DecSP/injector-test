@@ -21,6 +21,11 @@ def download_page(url, output_dir):
 
     soup = BeautifulSoup(content, "html.parser")
 
+    # Remove the tag with id="i18nWebflowScript"
+    i18n_script = soup.find(id="i18nWebflowScript")
+    if i18n_script:
+        i18n_script.decompose()
+
     for tag in soup.find_all():
         if "integrity" in tag.attrs:
             del tag["integrity"]
@@ -106,6 +111,6 @@ def download_and_replace_asset(asset_url, base_url, assets_dir):
 
 # Usage
 url = "https://skydeck.webflow.io"  # Replace with the URL you want to download
-output_directory = "downloaded_page"
+output_directory = "../en/"
 
 download_page(url, output_directory)
