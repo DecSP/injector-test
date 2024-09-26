@@ -12,6 +12,38 @@ let usePathParam = undefined;
 let baseUrl = undefined;
 let currentPath = undefined;
 
+const getChangeLanguageScript = () => `
+function changeLanguage(language) {
+  const url = new URL(window.location);
+
+  if (usePathParam) {
+    const pathParts = "${currentPath}".split("/").filter(Boolean);
+    if (language === "en") {
+      if (isLanguageSupported(pathParts[0])) {
+        pathParts.shift();
+      }
+    } else {
+      if (isLanguageSupported(pathParts[0])) {
+        pathParts[0] = language;
+      } else {
+        pathParts.unshift(language);
+      }
+    }
+
+    url.pathname = new URL("${baseUrl}/"+pathParts.join("/")).pathname;
+    url.searchParams.delete("lang");
+  } else {
+    if (language === "en") {
+      url.searchParams.delete("lang");
+    } else {
+      url.searchParams.set("lang", language);
+    }
+  }
+
+  window.history.pushState({}, "", url.href);
+  window.location.reload();
+}`;
+
 function fetchTranslations() {
   const translationsPath = path.resolve(__dirname, "translations.json");
   const translationsJson = fs.readFileSync(translationsPath, "utf8");
@@ -244,7 +276,7 @@ function createLanguageSelector(selectedLanguage) {
 
   const dropdown = document.createElement("select");
   dropdown.id = "languageDropdown";
-  // dropdown.onchange = changeLanguage;
+  dropdown.onchange = `changeLanguage(this.value)`;
 
   supportedLanguages.forEach((language) => {
     const option = document.createElement("option");
@@ -285,6 +317,10 @@ function createLanguageSelector(selectedLanguage) {
   `;
 
   document.head.appendChild(style);
+
+  const script = document.createElement("script");
+  script.textContent = getChangeLanguageScript();
+  document.body.appendChild(script);
 }
 
 const applyTranslation = async (doc, language, options) => {
