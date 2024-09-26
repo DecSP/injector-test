@@ -111,6 +111,6 @@ def download_and_replace_asset(asset_url, base_url, assets_dir):
 
 # Usage
 url = "https://skydeck.webflow.io"  # Replace with the URL you want to download
-output_directory = "../en/"
+output_directory = "../original/"
 
 download_page(url, output_directory)

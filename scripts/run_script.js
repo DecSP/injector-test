@@ -6,7 +6,7 @@ const { applyTranslation, supportedLanguages } = require('./translate.js');
 (async () => {
     try {
         const baseDir = path.resolve(__dirname, '..');
-        const englishHtmlPath = path.join(baseDir, 'en', 'index.html');
+        const englishHtmlPath = path.join(baseDir, 'original', 'index.html');
 
         if (!(await fs.pathExists(englishHtmlPath))) {
             throw new Error(`English HTML file not found: ${englishHtmlPath}`);
@@ -18,8 +18,6 @@ const { applyTranslation, supportedLanguages } = require('./translate.js');
         const usePathParam = true;
 
         for (const lang of supportedLanguages) {
-            if (lang.value === 'en') continue;
-
             console.log(`Processing ${lang.text} (${lang.value})...`);
 
             const dom = new JSDOM(html);
@@ -35,7 +33,7 @@ const { applyTranslation, supportedLanguages } = require('./translate.js');
             await fs.outputFile(outputPath, modifiedHtml, 'utf8');
             console.log(`Translated HTML saved to ${outputPath}`);
 
-            const srcAssetsPath = path.join(baseDir, 'en', 'assets');
+            const srcAssetsPath = path.join(baseDir, 'original', 'assets');
             const destAssetsPath = path.join(baseDir, lang.value, 'assets');
 
             if (await fs.pathExists(srcAssetsPath)) {

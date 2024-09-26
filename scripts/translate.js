@@ -16,20 +16,9 @@ const getChangeLanguageScript = () => `
 function changeLanguage(language) {
   const url = new URL(window.location);
 
-  if (usePathParam) {
+  if (${usePathParam}) {
     const pathParts = "${currentPath}".split("/").filter(Boolean);
-    if (language === "en") {
-      if (isLanguageSupported(pathParts[0])) {
-        pathParts.shift();
-      }
-    } else {
-      if (isLanguageSupported(pathParts[0])) {
-        pathParts[0] = language;
-      } else {
-        pathParts.unshift(language);
-      }
-    }
-
+    pathParts[0] = language;
     url.pathname = new URL("${baseUrl}/"+pathParts.join("/")).pathname;
     url.searchParams.delete("lang");
   } else {
@@ -276,7 +265,7 @@ function createLanguageSelector(selectedLanguage) {
 
   const dropdown = document.createElement("select");
   dropdown.id = "languageDropdown";
-  dropdown.onchange = `changeLanguage(this.value)`;
+  dropdown.setAttribute("onchange", "changeLanguage(this.value)");
 
   supportedLanguages.forEach((language) => {
     const option = document.createElement("option");
