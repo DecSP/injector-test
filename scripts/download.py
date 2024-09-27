@@ -3,12 +3,24 @@ import requests
 import hashlib
 import re
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin, urlparse, unquote, urlsplit, urlunsplit
+from urllib.parse import urljoin, unquote, urlsplit, urlunsplit
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
-def download_page(url, output_dir):
+BASE_DIR = os.path.join(os.path.dirname(__file__), "..")
+BASE_URL = os.getenv("BASE_URL")
+TARGET_URL = os.getenv("TARGET_URL")
+ASSET_DIR_NAME = "assets"
 
-    assets_dir = os.path.join(output_dir, "assets")
+assets_dir = os.path.join(BASE_DIR, ASSET_DIR_NAME)
+output_dir = os.path.join(BASE_DIR, "original")
+
+
+def download_page(url):
+
     os.makedirs(assets_dir, exist_ok=True)
 
     response = requests.get(url)
@@ -91,7 +103,6 @@ def download_and_replace_asset(asset_url, base_url, assets_dir):
         original_extension = ".bin"
     new_filename = f"{url_hash}{original_extension}"
 
-    local_path = os.path.join("assets", new_filename)
     full_local_path = os.path.join(assets_dir, new_filename)
 
     if not os.path.exists(full_local_path):
@@ -105,12 +116,9 @@ def download_and_replace_asset(asset_url, base_url, assets_dir):
             return asset_url
 
     # Reconstruct the URL with the local path and original query parameters
+    local_path = os.path.join(ASSET_DIR_NAME, new_filename)
     new_url = urlunsplit(("", "", local_path, parsed_url.query, ""))
-    return new_url
+    return f"{BASE_URL}/{new_url}"
 
 
-# Usage
-url = "https://skydeck.webflow.io"  # Replace with the URL you want to download
-output_directory = "../original/"
-
-download_page(url, output_directory)
+download_page(TARGET_URL)

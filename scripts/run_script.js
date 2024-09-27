@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const { JSDOM } = require('jsdom');
 const { applyTranslation, supportedLanguages } = require('./translate.js');
+require('dotenv').config(); // Add this line to load .env file
 
 (async () => {
     try {
@@ -14,7 +15,8 @@ const { applyTranslation, supportedLanguages } = require('./translate.js');
 
         const html = await fs.readFile(englishHtmlPath, 'utf8');
 
-        const baseUrl = "https://decsp.github.io/injector-test";
+        // Load baseUrl from .env file
+        const baseUrl = process.env.BASE_URL;
         const usePathParam = true;
 
         for (const lang of supportedLanguages) {
@@ -32,16 +34,6 @@ const { applyTranslation, supportedLanguages } = require('./translate.js');
             const outputPath = path.join(baseDir, lang.value, 'index.html');
             await fs.outputFile(outputPath, modifiedHtml, 'utf8');
             console.log(`Translated HTML saved to ${outputPath}`);
-
-            const srcAssetsPath = path.join(baseDir, 'original', 'assets');
-            const destAssetsPath = path.join(baseDir, lang.value, 'assets');
-
-            if (await fs.pathExists(srcAssetsPath)) {
-                await fs.copy(srcAssetsPath, destAssetsPath);
-                console.log(`Assets copied to ${destAssetsPath}`);
-            } else {
-                console.warn(`Assets folder not found: ${srcAssetsPath}`);
-            }
         }
 
         console.log('All processing completed successfully.');
